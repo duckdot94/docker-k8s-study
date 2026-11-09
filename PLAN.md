@@ -15,12 +15,12 @@
 
 ## 1주차: Docker (5~7일)
 
-### Day 1: 컨테이너 기본 + 환경 설치 (완료: 2026-11-09, 대화형 ubuntu 실습 제외)
-- [ ] 컨테이너 vs VM 개념 (별도로 정리하지 않음, 복습 필요)
+### Day 1: 컨테이너 기본 + 환경 설치 (완료: 2026-11-09)
+- [x] 컨테이너 vs VM 개념 → [container-vs-vm.md](week1/day1-container-basics/container-vs-vm.md)
 - [x] OrbStack 설치 (`brew install --cask orbstack`) - OrbStack 2.2.5 / Docker 29.8.2
 - [x] `docker run`, `ps`, `exec`, `logs`, `stop`, `start`, `rm`
 - [x] nginx 컨테이너 띄워 `curl`로 확인 (호스트 8080 포트 충돌로 `-p 8081:80` 사용)
-- [ ] 대화형 컨테이너 `docker run -it --rm ubuntu bash` (건너뜀, 별도 터미널에서 해 보기)
+- [x] 대화형 컨테이너 `docker run -it --rm ubuntu bash` (별도 터미널에서 실습)
 
 **배운 것**
 - `run`은 새 컨테이너 생성, `start`는 기존 컨테이너 재시작. `stop`해도 컨테이너는 `Exited`로 남고 `rm`해야 삭제됨
