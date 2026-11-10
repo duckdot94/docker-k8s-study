@@ -1,6 +1,6 @@
 # Week 1 - Day 2: 이미지와 Dockerfile
 
-> 상태: 완료 (2026-11-10) / `ENTRYPOINT` 직접 바꿔 보기와 `docker image inspect`는 하지 않음
+> 상태: 완료 (2026-11-10) / `docker image inspect`는 하지 않음
 
 ## 목표
 - 이미지 레이어와 빌드 캐시 개념을 이해한다
@@ -69,12 +69,39 @@ docker history hello-py:1.0       # 레이어 확인
 - 파일 변경에는 `sed -i '' 's/Hello from/Hi from/' app.py` 사용
 - 이미지를 새로 빌드해도 **이미 실행 중인 컨테이너는 바뀌지 않는다**. `hello`(1.0)는 `Hello from`, `hello2`(1.2)는 `Hi from` 응답. 반영하려면 컨테이너를 지우고 새 이미지로 다시 만들어야 함
 
-## 실습 5. CMD vs ENTRYPOINT [일부 완료]
+## 실습 5. CMD vs ENTRYPOINT [완료]
+### (1) CMD 덮어쓰기
 ```bash
-docker run --rm hello-py:1.2 python -c "print('CMD를 덮어썼다')"   # CMD 덮어쓰기 확인
+docker run --rm hello-py:1.2 python -c "print('CMD를 덮어썼다')"   # CMD 통째로 대체
 ```
-- `CMD`는 `docker run` 뒤에 명령을 쓰면 대체됨 (기본값), `ENTRYPOINT`는 뒤에 쓴 것이 인자로 붙음
-- [ ] Dockerfile을 `ENTRYPOINT ["python"]` + `CMD ["app.py"]`로 바꿔 동작 차이를 직접 확인하기 (하지 않음)
+
+### (2) ENTRYPOINT + CMD 조합
+기존 Dockerfile은 그대로 두고 `app/Dockerfile.entry`를 따로 만들어 빌드했다.
+```dockerfile
+FROM python:3.12-slim
+WORKDIR /app
+COPY app.py .
+EXPOSE 8000
+ENTRYPOINT ["python"]
+CMD ["app.py"]
+```
+```bash
+docker build -f Dockerfile.entry -t hello-py:entry .
+docker run --rm hello-py:entry -c "print('인자로 붙였다')"   # python -c "..." 실행
+docker run --rm hello-py:entry --version                     # Python 3.12.16
+docker run -d --rm --name hello3 -p 8002:8000 hello-py:entry # 인자 없음 → python app.py, 서버 기동
+```
+
+| Dockerfile | `docker run` 입력 | 실제 실행되는 명령 |
+|---|---|---|
+| `CMD ["python", "app.py"]` | `python -c "..."` | `python -c "..."` (CMD를 통째로 **대체**) |
+| `ENTRYPOINT ["python"]` + `CMD ["app.py"]` | (없음) | `python app.py` |
+| `ENTRYPOINT ["python"]` + `CMD ["app.py"]` | `-c "..."` | `python -c "..."` (ENTRYPOINT 뒤에 **인자로 붙음**) |
+| `ENTRYPOINT ["python"]` + `CMD ["app.py"]` | `--version` | `python --version` |
+
+- `ENTRYPOINT`는 컨테이너의 정체를 고정하고 `CMD`는 그 뒤에 붙는 기본 인자. CLI 도구처럼 쓸 때 `ENTRYPOINT`가 유용
+- 인자 없이 실행하면 둘 다 `docker ps`의 COMMAND에 `"python app.py"`로 똑같이 보여서 겉으로는 구분 안 됨. 인자를 줬을 때 차이가 드러난다
+- 빌드할 때 `WORKDIR`, `COPY`가 `CACHED`: 다른 Dockerfile이어도 단계의 입력이 같으면 캐시 공유. `ENTRYPOINT`/`CMD`는 파일을 안 바꾸는 설정이라 `[N/3]` 단계로 안 나오지만 설정 해시는 달라짐 (레이어는 같고 시작 방식만 다른 이미지)
 
 ## 확인 질문
 - [x] `COPY`와 `ADD`의 차이는?
@@ -87,8 +114,9 @@ docker run --rm hello-py:1.2 python -c "print('CMD를 덮어썼다')"   # CMD �
 ## 정리
 ```bash
 docker rm -f hello hello2
+docker stop hello3          # --rm으로 만들어서 stop하면 자동 삭제
 ```
-- 컨테이너는 모두 삭제, 이미지 `hello-py:1.0/1.1/1.2`는 남겨 둠
+- 컨테이너는 모두 삭제, 이미지 `hello-py:1.0/1.1/1.2/entry`는 남겨 둠
 
 ## 메모
 
@@ -100,10 +128,10 @@ docker rm -f hello hello2
 
 ### 겪은 문제
 - 입력이 중간에 끊겨 전송되는 일이 몇 번 있었다 (`cd week1/d`, `docker im`). 길면 복사해서 붙여넣기
+- 이미지 이름 오타(`hello-py:enrty`): 로컬에 없으면 Docker Hub에서 찾다가 `pull access denied`로 실패. `docker images`로 확인하고 복사해서 쓰기
 - 명령 앞에 `!`를 빼먹으면 실행되지 않는다
 - 대소문자 구분: `Docker`는 오류 (Day 1)
 
 ### 복습 거리
 - [ ] Dockerfile을 보지 않고 직접 처음부터 써 보기
-- [ ] `ENTRYPOINT` + `CMD` 조합 실험
 - [ ] 자주 바뀌는 `COPY`를 위로 올렸을 때 캐시가 어떻게 달라지는지 비교 (Day 4에서 `pip install`과 함께)

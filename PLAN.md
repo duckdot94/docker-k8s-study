@@ -33,12 +33,12 @@
 - [x] 이미지, 레이어, 캐시 구조 (`docker history`, `CACHED` 확인)
 - [x] Dockerfile 작성 (`FROM`, `WORKDIR`, `COPY`, `EXPOSE`, `CMD`) - 파일은 Claude가 대신 작성, 직접 써 보기는 복습 거리
 - [x] `docker build`, `.dockerignore`
-- [ ] `ENTRYPOINT` + `CMD` 조합 실험 (`CMD` 덮어쓰기까지만 확인)
+- [x] `ENTRYPOINT` + `CMD` 조합 실험 (`Dockerfile.entry`로 인자가 붙는 동작 확인)
 
 **배운 것**
 - 이미지는 레이어의 쌓임. `FROM`이 가져온 베이스 레이어가 대부분이고 우리 `COPY`는 4.1kB
 - 빌드 캐시: 단계의 입력이 같으면 `CACHED`, 바뀐 단계부터 아래는 다시 실행. 자주 바뀌는 `COPY`는 아래에
-- `RUN`은 빌드 시, `CMD`/`ENTRYPOINT`는 컨테이너 시작 시 실행. `CMD`는 `docker run` 뒤 명령으로 덮어써짐
+- `RUN`은 빌드 시, `CMD`/`ENTRYPOINT`는 컨테이너 시작 시 실행. `CMD`는 `docker run` 뒤 명령으로 덮어써지고, `ENTRYPOINT`는 뒤에 쓴 것이 인자로 붙음
 - 이미지를 다시 빌드해도 실행 중인 컨테이너는 바뀌지 않음 (지우고 새 이미지로 다시 만들어야 함)
 - `COPY`는 복사만, `ADD`는 압축 해제와 URL 다운로드까지 해서 `COPY` 권장
 
