@@ -7,7 +7,7 @@
 
 ## 진행 현황 체크
 
-- [ ] 1주차: Docker (진행 중, Day 1 완료 / 다음: Day 2 이미지와 Dockerfile)
+- [ ] 1주차: Docker (진행 중, Day 1~2 완료 / 다음: Day 3 볼륨과 네트워크)
 - [ ] 2주차: Kubernetes 기초
 - [ ] 3주차: Kubernetes 심화 + 프로젝트
 
@@ -29,10 +29,20 @@
 - `stop`→`start`는 컨테이너 안 파일이 유지되지만, `rm`→`run`은 새 컨테이너라 파일이 사라짐 → Day 3 볼륨의 필요성
 - 응답이 왔다고 컨테이너가 응답한 것은 아님. 포트 충돌 시 `docker logs`와 `lsof -nP -iTCP:<포트> -sTCP:LISTEN`으로 확인
 
-### Day 2: 이미지와 Dockerfile
-- [ ] 이미지, 레이어, 캐시 구조
-- [ ] Dockerfile 작성 (`FROM`, `RUN`, `COPY`, `CMD`, `ENTRYPOINT`)
-- [ ] `docker build`, `.dockerignore`
+### Day 2: 이미지와 Dockerfile (완료: 2026-11-10)
+- [x] 이미지, 레이어, 캐시 구조 (`docker history`, `CACHED` 확인)
+- [x] Dockerfile 작성 (`FROM`, `WORKDIR`, `COPY`, `EXPOSE`, `CMD`) - 파일은 Claude가 대신 작성, 직접 써 보기는 복습 거리
+- [x] `docker build`, `.dockerignore`
+- [ ] `ENTRYPOINT` + `CMD` 조합 실험 (`CMD` 덮어쓰기까지만 확인)
+
+**배운 것**
+- 이미지는 레이어의 쌓임. `FROM`이 가져온 베이스 레이어가 대부분이고 우리 `COPY`는 4.1kB
+- 빌드 캐시: 단계의 입력이 같으면 `CACHED`, 바뀐 단계부터 아래는 다시 실행. 자주 바뀌는 `COPY`는 아래에
+- `RUN`은 빌드 시, `CMD`/`ENTRYPOINT`는 컨테이너 시작 시 실행. `CMD`는 `docker run` 뒤 명령으로 덮어써짐
+- 이미지를 다시 빌드해도 실행 중인 컨테이너는 바뀌지 않음 (지우고 새 이미지로 다시 만들어야 함)
+- `COPY`는 복사만, `ADD`는 압축 해제와 URL 다운로드까지 해서 `COPY` 권장
+
+상세: [week1/day2-image-dockerfile/README.md](week1/day2-image-dockerfile/README.md)
 
 ### Day 3: 볼륨과 네트워크
 - [ ] 볼륨 vs 바인드 마운트
