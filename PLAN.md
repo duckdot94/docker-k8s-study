@@ -7,7 +7,7 @@
 
 ## 진행 현황 체크
 
-- [ ] 1주차: Docker (진행 중, Day 1~2 완료 / 다음: Day 3 볼륨과 네트워크)
+- [ ] 1주차: Docker (진행 중, Day 1~3 완료 / 다음: Day 4 Docker Compose)
 - [ ] 2주차: Kubernetes 기초
 - [ ] 3주차: Kubernetes 심화 + 프로젝트
 
@@ -44,10 +44,12 @@
 
 상세: [week1/day2-image-dockerfile/README.md](week1/day2-image-dockerfile/README.md)
 
-### Day 3: 볼륨과 네트워크
-- [ ] 볼륨 vs 바인드 마운트
-- [ ] bridge 네트워크, 컨테이너 간 통신
-- [ ] 포트 매핑
+### Day 3: 볼륨과 네트워크 (완료: 2026-11-24)
+- [x] 볼륨 vs 바인드 마운트 (컨테이너 삭제 시 유실 → 네임드 볼륨으로 유지, 바인드 마운트 즉시 반영)
+- [x] bridge 네트워크, 컨테이너 간 통신 (사용자 정의 네트워크는 이름으로 접근, 기본 bridge는 불가)
+- [x] 포트 매핑 (호스트 8080 충돌로 `-p 8081:80` 사용)
+
+상세: [week1/day3-volume-network/README.md](week1/day3-volume-network/README.md)
 
 ### Day 4: Docker Compose
 - [ ] `docker-compose.yml` 작성
